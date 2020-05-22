@@ -29,4 +29,8 @@ defmodule EDA.Service do
     hash = EDA.compute(password)
     {:reply, hash, count + 1}
   end
+
+  def compute(password) do
+    GenServer.call(__MODULE__, {:compute, password})
+  end
 end
