@@ -10,7 +10,12 @@ defmodule EDA do
   @spec start_link(arg :: any) :: {:ok, pid}
   def start_link(arg \\ []) do
     Logger.debug("start_link(#{inspect(arg)})")
-    Task.start_link(fn -> EDA.infinite_receive_loop(0) end)
+    Task.start_link(&EDA.init/0)
+  end
+
+  @spec init :: no_return
+  def init() do
+    EDA.infinite_receive_loop(0)
   end
 
   @doc """
@@ -46,11 +51,11 @@ defmodule EDA do
       {:compute, s} ->
         compute(s)
 
-      {:hello_reply, caller, who} ->
-        send(caller, hello(who))
+      {:hello_reply, from, who} ->
+        send(from, hello(who))
 
-      {:compute_reply, caller, s} ->
-        send(caller, compute(s))
+      {:compute_reply, from, s} ->
+        send(from, compute(s))
 
       {function, args} when is_atom(function) ->
         Logger.debug("function => #{function}")
