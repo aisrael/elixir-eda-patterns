@@ -1,6 +1,12 @@
-# EDA
+# Event-Driven Architectural Patterns in Elixir
 
-**TODO: Add description**
+## Usage
+
+```
+$ git clone https://github.com/aisrael/elixir-eda-patterns.git
+$ cd elixir-eda-patterns
+$ iex -S mix
+```
 
 ## Installation
 
@@ -18,4 +24,3 @@ end
 Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
 and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
 be found at [https://hexdocs.pm/eda](https://hexdocs.pm/eda).
-
