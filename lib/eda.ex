@@ -10,7 +10,7 @@ defmodule EDA do
   @spec start_link(arg :: any) :: {:ok, pid}
   def start_link(arg \\ []) do
     Logger.debug("start_link(#{inspect(arg)})")
-    Task.start_link(&EDA.infinite_receive_loop/0)
+    Task.start_link(fn -> EDA.infinite_receive_loop(0) end)
   end
 
   @doc """
@@ -36,8 +36,9 @@ defmodule EDA do
   @doc """
   An infinite receive loop
   """
-  @spec infinite_receive_loop :: no_return
-  def infinite_receive_loop() do
+  def infinite_receive_loop(count) do
+    Logger.debug("infinite_receive_loop(count => #{count})")
+
     receive do
       {:hello, who} ->
         hello(who)
@@ -60,11 +61,11 @@ defmodule EDA do
         Logger.debug(inspect(x))
     after
       30000 ->
-        Logger.debug("Timeout after 5 seconds")
-        :ok
+        Logger.debug("Timeout after 30 seconds")
+        infinite_receive_loop(count)
     end
 
-    infinite_receive_loop()
+    infinite_receive_loop(count + 1)
   end
 
   def foo(param) do
