@@ -7,10 +7,7 @@ defmodule EDA.Application do
 
   def start(_type, _args) do
     children = [
-      %{
-        id: EDA,
-        start: {EDA, :start_link, []}
-      }
+      {EDA, ["hello?"]}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

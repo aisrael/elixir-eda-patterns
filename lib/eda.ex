@@ -5,6 +5,8 @@ defmodule EDA do
 
   require Logger
 
+  use Task, restart: :permanent
+
   @spec start_link(arg :: any) :: {:ok, pid}
   def start_link(arg \\ []) do
     Logger.debug("start_link(#{inspect(arg)})")
@@ -37,11 +39,25 @@ defmodule EDA do
   @spec infinite_receive_loop :: no_return
   def infinite_receive_loop() do
     receive do
-      {:hello, who} -> hello(who)
-      {:compute, s} -> compute(s)
-      {:hello_reply, caller, who} -> send(caller, hello(who))
-      {:compute_reply, caller, s} -> send(caller, compute(s))
-      x -> Logger.debug(inspect(x))
+      {:hello, who} ->
+        hello(who)
+
+      {:compute, s} ->
+        compute(s)
+
+      {:hello_reply, caller, who} ->
+        send(caller, hello(who))
+
+      {:compute_reply, caller, s} ->
+        send(caller, compute(s))
+
+      {function, args} when is_atom(function) ->
+        Logger.debug("function => #{function}")
+        Logger.debug("args => #{inspect(args)}")
+        apply(__MODULE__, function, args)
+
+      x ->
+        Logger.debug(inspect(x))
     after
       30000 ->
         Logger.debug("Timeout after 5 seconds")
@@ -49,6 +65,14 @@ defmodule EDA do
     end
 
     infinite_receive_loop()
+  end
+
+  def foo(param) do
+    Logger.debug("foo(#{param})")
+  end
+
+  def bar(param) do
+    Logger.debug("bar(#{param})")
   end
 
   def receive do
