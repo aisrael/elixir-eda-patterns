@@ -5,6 +5,12 @@ defmodule EDA do
 
   require Logger
 
+  @spec start_link(arg :: any) :: {:ok, pid}
+  def start_link(arg \\ []) do
+    Logger.debug("start_link(#{inspect(arg)})")
+    Task.start_link(&EDA.infinite_receive_loop/0)
+  end
+
   @doc """
   Performs a time-consuming computation (Bcrypt)
   """
@@ -33,15 +39,33 @@ defmodule EDA do
     receive do
       {:hello, who} -> hello(who)
       {:compute, s} -> compute(s)
-      {:hello_reply, pid, who} -> send(pid, hello(who))
-      {:compute_reply, pid, s} -> send(pid, compute(s))
+      {:hello_reply, caller, who} -> send(caller, hello(who))
+      {:compute_reply, caller, s} -> send(caller, compute(s))
       x -> Logger.debug(inspect(x))
     after
-      5000 ->
+      30000 ->
         Logger.debug("Timeout after 5 seconds")
         :ok
     end
 
     infinite_receive_loop()
+  end
+
+  def receive do
+    receive do
+      msg -> IO.puts(inspect(msg))
+    after
+      500 -> IO.puts("Timeout")
+    end
+  end
+
+  def compute_async_await_reply(pid, password) do
+    send(pid, {:compute_reply, self(), password})
+
+    receive do
+      msg -> msg
+    after
+      5000 -> IO.puts("Timeout")
+    end
   end
 end
